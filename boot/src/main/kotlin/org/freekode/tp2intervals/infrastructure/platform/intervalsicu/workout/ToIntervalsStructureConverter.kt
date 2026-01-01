@@ -32,8 +32,8 @@ class ToIntervalsStructureConverter(
     }
 
     private fun getStepString(workoutStep: SingleStep): String {
-        val description = getDescription(structure.target, workoutStep)
         val length = toStepLength(workoutStep.length)
+        val description = getDescription(structure.target, workoutStep, length)
         val targetUnitStr = targetTypeMap[structure.target]!!
         val target = toTarget(structure.target, workoutStep.target)
         val cadence = workoutStep.cadence?.let {
@@ -67,8 +67,23 @@ class ToIntervalsStructureConverter(
         return targetVal
     }
 
-    private fun getDescription(targetUnit: WorkoutStructure.TargetUnit, workoutStep: SingleStep) : String {
+    private fun getDescription(targetUnit: WorkoutStructure.TargetUnit, workoutStep: SingleStep, length: String) : String {
         var description = workoutStep.name.orEmpty().replace("\\", "/")
+
+        var lengthStr = length.fold("") { acc, char ->
+            if (acc.isNotEmpty() &&
+                ((acc.last().isDigit() && char.isLetter()) ||
+                (acc.last().isLetter() && char.isDigit()))) {
+                acc + "." + char
+            } else {
+                acc + char
+            }
+        }
+
+        var lap = when (description) {
+            "Easy", "Warm up", "Cool Down" -> "Press lap ${lengthStr}."
+            else -> ""
+        }
 
         if (targetUnit == WorkoutStructure.TargetUnit.RELATIVE_PERCEIVED_EFFORT) {
           if (workoutStep.target.isSingleValue()) {
@@ -78,6 +93,6 @@ class ToIntervalsStructureConverter(
           }
         }
 
-        return description.trim()
+        return "${description} ${lap}".trim()
     }
 }
