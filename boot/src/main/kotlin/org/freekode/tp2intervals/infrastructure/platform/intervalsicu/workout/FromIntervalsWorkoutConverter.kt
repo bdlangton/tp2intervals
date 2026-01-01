@@ -24,7 +24,7 @@ class FromIntervalsWorkoutConverter(
                 eventDTO.description,
                 eventDTO.mapDuration(),
                 eventDTO.icu_training_load,
-                ExternalData.empty().withIntervals(eventDTO.id.toString()).fromSimpleString(eventDTO.description ?: "")
+                ExternalData.empty().withIntervals(eventDTO.id.toString()).fromSimpleString()
             ),
             eventDTO.start_date_local.toLocalDate(),
             workoutsStructure,
